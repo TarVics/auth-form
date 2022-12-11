@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>User authorization</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="css/animate-custom.css"/>
+</head>
+<body>
+<div class="container">
+        <a class="hidden-anchor" id="register-link"></a>
+        <a class="hidden-anchor" id="login-link"></a>
+        <div id="wrapper">
+            <div id="login" class="animate form">
+                <form autocomplete="on">
+                    <h1>Log in</h1>
+                    <p>
+                        <label for="username" data-icon="u"> Your email or username </label>
+                        <input id="username"
+                               name="username"
+                               placeholder="myusername or mymail@mail.com"
+                               type="text"
+                               required="required"
+                        />
+                    </p>
+                    <p>
+                        <label for="password" data-icon="p"> Your password </label>
+                        <input id="password"
+                               name="password"
+                               placeholder="eg. X8df!90EO"
+                               type="password"
+                               required="required"
+                        />
+                    </p>
+                    <p class="keep-logged">
+                        <input id="keep-logged-in"
+                               name="keep-logged-in"
+                               type="checkbox"
+                               value="1"
+                        />
+                        <label for="keep-logged-in">Keep me logged in</label>
+                    </p>
+                    <p class="login button">
+                        <input type="submit" value="Login"/>
+                    </p>
+                    <p class="change-link">
+                        Not a member yet ?
+                        <a href="#register-link">Join us</a>
+                    </p>
+                </form>
+            </div>
+
+            <div id="register" class="animate form">
+                <form autocomplete="on">
+                    <h1>Sign up</h1>
+                    <p>
+                        <label for="register-username"
+                               data-icon="u">Your username</label>
+                        <input id="register-username"
+                               name="register-username"
+                               placeholder="mysuperusername690"
+                               type="text"
+                               required="required"
+                               pattern="[0-9a-zA-Z-\.]+"
+                        />
+                    </p>
+                    <p>
+                        <label for="register-email"
+                               data-icon="e"> Your email</label>
+                        <input id="register-email"
+                               name="register-email"
+                               placeholder="mysupermail@mail.com"
+                               type="email"
+                               required="required"
+                               pattern="(?![_.-])((?![_.-][_.-])[a-zA-Z\d_.-]){0,63}[a-zA-Z\d]@((?!-)((?!--)[a-zA-Z\d-]){0,63}[a-zA-Z\d]\.){1,2}([a-zA-Z]{2,14}\.)?[a-zA-Z]{2,14}"
+                        />
+                    </p>
+                    <p>
+                        <label for="register-password"
+                               data-icon="p">Your password </label>
+                        <input id="register-password"
+                               name="register-password"
+                               placeholder="eg. X8df!90EO"
+                               type="password"
+                               required="required"
+                               minlength="6"
+                               maxlength="16"
+                               data-equal="register-password-confirm"
+                        />
+                    </p>
+                    <p>
+                        <label for="register-password-confirm"
+                               data-icon="p">Please confirm your password </label>
+                        <input id="register-password-confirm"
+                               name="register-password-confirm"
+                               placeholder="eg. X8df!90EO"
+                               type="password"
+                               required="required"
+                               minlength="6"
+                               maxlength="16"
+                               data-equal="register-password"
+                        />
+                    </p>
+                    <p class="sign-in button">
+                        <input type="submit" value="Sign up"/>
+                    </p>
+                    <p class="change-link">
+                        Already a member ?
+                        <a href="#login-link"> Go and log in </a>
+                    </p>
+                </form>
+            </div>
+        </div>
+</div>
+<script>
+    registerFormValidator('#login > form');
+    registerFormValidator('#register > form');
+
+    function registerFormValidator(formSelector) {
+        const form = document.querySelector(formSelector);
+        form.addEventListener("submit", e => {
+            e.target.reset();
+            e.preventDefault();
+            setTimeout(() => alert("Data sent!"));
+            location.href = '#login-link';
+        });
+        form.addEventListener("change", eventHandler);
+        form.addEventListener("invalid", eventHandler, true);
+
+        const elements = form.querySelectorAll('input:not([type=submit])');
+        elements.forEach(element => element.addEventListener("input", eventHandler));
+    }
+
+    function eventHandler(e) {
+        (e.target.tagName === "INPUT") && checkErrorAndSetMessage(e.target);
+    }
+
+    function checkEquality(input) {
+        const elName = input.dataset.equal;
+        if (elName) {
+            const element = input.form[elName];
+            const result = input.value === element.value;
+            if (!result) {
+                element.style.outline = '1px solid orange';
+                input.style.outline = '1px solid orange';
+            } else {
+                input.setCustomValidity("");
+                element.setCustomValidity("");
+                input.style.outline = 'none';
+                element.style.outline = 'none';
+            }
+            return result;
+        } else {
+            return true;
+        }
+    }
+
+    function checkErrorAndSetMessage(input) {
+        if (input.validity.valueMissing) {
+            input.setCustomValidity("Please enter a field value");
+            input.style.outline = '1px solid red';
+        } else if (input.validity.tooShort) {
+            input.setCustomValidity("The value length cannot be less than " + input.minLength + " characters");
+            input.style.outline = '1px solid red';
+        } else if (input.validity.tooLong) {
+            input.setCustomValidity("The value length cannot be greater than " + input.maxLength + " characters");
+            input.style.outline = '1px solid red';
+        } else if (input.validity.typeMismatch) {
+            input.setCustomValidity("Please enter the correct value of the email address");
+            input.style.outline = '1px solid red';
+        } else if (input.validity.patternMismatch) {
+            input.setCustomValidity("The value does not match the format: \n" + input.pattern);
+            input.style.outline = '1px solid red';
+        } else if (!checkEquality(input)) {
+            input.setCustomValidity("The values do not match");
+        } else {
+            input.setCustomValidity("");
+            input.style.outline = 'none';
+        }
+    }
+</script>
+</body>
+</html>
